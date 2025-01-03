@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -251,6 +252,32 @@
                     "..........",
                     ".........."
                 ]
+            ],
+            playing: [
+                [
+                    "..........",
+                    "...####...",
+                    "..######..",
+                    "..#....#..",
+                    "..#..O.#..",
+                    "..##PLAY..",
+                    "...#..#...",
+                    "...####...",
+                    "..........",
+                    ".........."
+                ],
+                [
+                    "..........",
+                    "...####...",
+                    "..######..",
+                    "..#....#..",
+                    "..#..O.#..",
+                    "..PLAY##..",
+                    "...#..#...",
+                    "...####...",
+                    "..........",
+                    ".........."
+                ]
             ]
         };
 
@@ -277,8 +304,10 @@
                     pixels[i].classList.add("toilet");
                 } else if (rows[i] === "Z") {
                     pixels[i].classList.add("sleep");
+                } else if (rows[i] === "P") {
+                    pixels[i].classList.add("play");
                 } else {
-                    pixels[i].classList.remove("active", "eye", "food", "toilet", "sleep");
+                    pixels[i].classList.remove("active", "eye", "food", "toilet", "sleep", "play");
                 }
             }
             frameIndex++;
@@ -319,6 +348,12 @@
             hunger = Math.max(0, hunger - 30);
             currentState = "eating";
             setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000);
+        }
+
+        function playWithPet() {
+            boredom = Math.max(0, boredom - 30); // 降低無聊度
+            currentState = "playing";
+            setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000); // 3秒後恢復正常
         }
 
         function cleanPet() {
