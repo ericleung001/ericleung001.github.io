@@ -326,31 +326,40 @@
         }
 
         function saveGame() {
-            const saveData = {
-                hunger,
-                toilet,
-                boredom,
-                startDate,
-                isSleeping
-            };
-            saveInput.value = btoa(JSON.stringify(saveData));
-        }
+    const saveData = {
+        hunger,
+        toilet,
+        boredom,
+        startDate: startDate.toISOString(), // 確保儲存的是 ISO 格式的日期
+        isSleeping
+    };
+    saveInput.value = btoa(JSON.stringify(saveData)); // 將數據編碼為 Base64
+}
 
         function loadGame() {
-            try {
-                const saveData = JSON.parse(atob(saveInput.value));
-                hunger = saveData.hunger;
-                toilet = saveData.toilet;
-                boredom = saveData.boredom;
-                startDate = new Date(saveData.startDate);
-                isSleeping = saveData.isSleeping;
-                updateAnimation();
-                updateRealTime();
-            } catch {
-                alert("無效的存檔代碼");
-            }
-        }
+    try {
+        const saveData = JSON.parse(atob(saveInput.value)); // 解碼存檔數據
+        const savedDate = new Date(saveData.startDate); // 儲存日期
+        const now = new Date(); // 現在日期
+        const elapsedDays = Math.floor((now - savedDate) / (1000 * 60 * 60 * 24)); // 計算日子差距
 
+        // 更新狀態值，根據時間差距增加數值
+        hunger = Math.min(150, saveData.hunger + elapsedDays * 5); // 每天增加5的飢餓
+        toilet = Math.min(180, saveData.toilet + elapsedDays * 4); // 每天增加4的廁所需求
+        boredom = Math.min(200, saveData.boredom + elapsedDays * 6); // 每天增加6的悶
+
+        startDate = new Date(saveData.startDate); // 恢復存檔的起始日期
+        isSleeping = saveData.isSleeping; // 恢復睡眠狀態
+
+        updateAnimation(); // 更新畫面動畫
+        updateRealTime(); // 更新時間顯示
+        updateStatusBars(); // 更新狀態條
+
+        alert(`遊戲已載入，經過了 ${elapsedDays} 日！`); // 顯示載入資訊
+    } catch {
+        alert("無效的存檔代碼");
+    }
+}
         function updateStatusBars() {
             hungerBar.style.width = hunger + "%";
             toiletBar.style.width = toilet + "%";
