@@ -112,7 +112,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v12</h1>
+    <h1>Pixel Tamagotchi - 熊仔 v13</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -158,6 +158,7 @@
         let currentState = "normal"; // 用來追蹤目前狀態
         let frameIndex = 0;
         let savedCode = "";
+        let lastSavedTime = new Date().getTime(); // 记录最后一次保存的时间
 
         const frames = {
             normal: [
@@ -286,14 +287,12 @@
         }
 
         function updateRealTime() {
-            const currentTime = new Date();
-            if (currentTime.getHours() === 9 && !isSleeping) {
-                isSleeping = true;
-                currentState = "sleeping";
-            } else if (currentTime.getHours() === 8) {
-                isSleeping = false;
+            const currentTime = new Date().getTime();
+            const elapsedTime = (currentTime - lastSavedTime) / 1000; // 毫秒轉換為秒
+            if (elapsedTime >= 86400) { // 每24小時增加1天
+                age++;
+                lastSavedTime = currentTime;
             }
-
             updateStatusBars();
         }
 
@@ -302,7 +301,6 @@
                 hunger = Math.min(100, hunger + 1);
                 toilet = Math.min(100, toilet + 1);
                 boredom = Math.min(100, boredom + 1);
-                age += 1; // 增加飼養日數
             }
             if (currentState !== "dead") {
                 updateStatusBars();
@@ -347,7 +345,7 @@
         }
 
         function saveGame() {
-            const gameData = `${hunger},${toilet},${boredom},${age}`;
+            const gameData = `${hunger},${toilet},${boredom},${age},${new Date().getTime()}`;
             savedCode = btoa(gameData); // 使用base64編碼儲存遊戲狀態
             savedCodeDiv.textContent = `儲存代碼：${savedCode.substring(0, 8)}`; // 顯示前8位字符
         }
@@ -356,11 +354,12 @@
             const code = loadCodeInput.value;
             try {
                 const gameData = atob(code); // 解碼base64
-                const [hungerValue, toiletValue, boredomValue, ageValue] = gameData.split(",");
+                const [hungerValue, toiletValue, boredomValue, ageValue, lastSavedTimeValue] = gameData.split(",");
                 hunger = parseInt(hungerValue, 10);
                 toilet = parseInt(toiletValue, 10);
                 boredom = parseInt(boredomValue, 10);
                 age = parseInt(ageValue, 10);
+                lastSavedTime = parseInt(lastSavedTimeValue, 10);
                 alert("遊戲已載入！");
                 restartGame();
             } catch (e) {
@@ -369,7 +368,7 @@
         }
 
         createPixels();
-        setInterval(updateRealTime, 60000); // 每分鐘更新一次時間
+        setInterval(updateRealTime, 1000); // 每秒更新一次時間
         setInterval(updatePetStatus, 1000); // 每秒更新一次狀態
         setInterval(() => renderFrame(currentState), 300); // 每300毫秒更新一次動畫
     </script>
