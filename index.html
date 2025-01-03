@@ -73,7 +73,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v03</h1>
+    <h1>Pixel Tamagotchi - 熊仔 v04</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -341,12 +341,12 @@ function loadGame() {
         const saveData = JSON.parse(atob(saveInput.value)); // 解碼存檔數據
         const savedDate = new Date(saveData.startDate); // 儲存日期
         const now = new Date(); // 現在日期
-        const elapsedDays = Math.floor((now - savedDate) / (1000 * 60 * 60 * 24)); // 計算日子差距
+        const elapsedMinutes = Math.floor((now - savedDate) / (1000 * 60)); // 計算分鐘差距
 
         // 更新狀態值，根據時間差距增加數值
-        hunger = Math.min(150, saveData.hunger + elapsedDays * 5); // 每天增加5的飢餓
-        toilet = Math.min(180, saveData.toilet + elapsedDays * 4); // 每天增加4的廁所需求
-        boredom = Math.min(200, saveData.boredom + elapsedDays * 6); // 每天增加6的悶
+        hunger = Math.min(150, saveData.hunger + elapsedMinutes * (5 / 1440)); // 每天增加5，換算到每分鐘增加5/1440
+        toilet = Math.min(180, saveData.toilet + elapsedMinutes * (4 / 1440)); // 每天增加4，換算到每分鐘增加4/1440
+        boredom = Math.min(200, saveData.boredom + elapsedMinutes * (6 / 1440)); // 每天增加6，換算到每分鐘增加6/1440
 
         startDate = new Date(saveData.startDate); // 恢復存檔的起始日期
         isSleeping = saveData.isSleeping; // 恢復睡眠狀態
@@ -355,11 +355,12 @@ function loadGame() {
         updateRealTime(); // 更新時間顯示
         updateStatusBars(); // 更新狀態條
 
-        alert(`遊戲已載入，經過了 ${elapsedDays} 日！`); // 顯示載入資訊
+        alert(`遊戲已載入，經過了 ${elapsedMinutes} 分鐘！`); // 顯示載入資訊
     } catch {
         alert("無效的存檔代碼");
     }
 }
+
         function updateStatusBars() {
             hungerBar.style.width = hunger + "%";
             toiletBar.style.width = toilet + "%";
