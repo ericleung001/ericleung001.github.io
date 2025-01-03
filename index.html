@@ -112,7 +112,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v9</h1>
+    <h1>Pixel Tamagotchi - 熊仔 v10</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -367,41 +367,45 @@
                 currentState = "sleeping";
             } else {
                 isSleeping = false;
-                currentState = "normal";
             }
+
+            updateStatusBars();
         }
 
         function updatePetStatus() {
-            if (!isSleeping && currentState !== "dead") {
-                hunger += 0.5;
-                toilet += 0.3;
-                boredom += 0.3;
+            if (currentState !== "dead" && !isSleeping) {
+                hunger = Math.min(100, hunger + 1);
+                toilet = Math.min(100, toilet + 1);
+                boredom = Math.min(100, boredom + 1);
+                age += 1; // 增加飼養日數
             }
-            updateStatusBars();
-            checkDeath(); // 檢查是否死亡
+            if (currentState !== "dead") {
+                updateStatusBars();
+                checkDeath();
+            }
         }
 
         function feedPet() {
             if (currentState !== "dead") {
-                hunger = Math.max(0, hunger - 20); 
-                currentState = "eating"; 
-                setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000); 
+                hunger = Math.max(0, hunger - 20);
+                currentState = "eating";
+                setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000);
             }
         }
 
         function playWithPet() {
             if (currentState !== "dead") {
-                boredom = Math.max(0, boredom - 20); 
-                currentState = "playing"; 
-                setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000); 
+                boredom = Math.max(0, boredom - 20);
+                currentState = "playing";
+                setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000);
             }
         }
 
         function cleanPet() {
             if (currentState !== "dead") {
-                toilet = Math.max(0, toilet - 30); 
+                toilet = Math.max(0, toilet - 30);
                 currentState = "toilet";
-                setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000); 
+                setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000);
             }
         }
 
@@ -414,19 +418,27 @@
             currentState = "normal";
             frameIndex = 0;
             renderFrame(currentState);
+            updateRealTime();
         }
 
         function saveGame() {
-            savedCode = Math.random().toString(36).substring(2, 10); // 生成隨機8位代碼
+            const gameData = `${hunger},${toilet},${boredom},${age}`;
+            savedCode = btoa(gameData); // 使用base64編碼儲存遊戲狀態
             savedCodeDiv.textContent = `儲存代碼：${savedCode}`;
         }
 
         function loadGame() {
             const code = loadCodeInput.value;
-            if (code === savedCode) {
+            try {
+                const gameData = atob(code); // 解碼base64
+                const [hungerValue, toiletValue, boredomValue, ageValue] = gameData.split(",");
+                hunger = parseInt(hungerValue, 10);
+                toilet = parseInt(toiletValue, 10);
+                boredom = parseInt(boredomValue, 10);
+                age = parseInt(ageValue, 10);
                 alert("遊戲已載入！");
                 restartGame();
-            } else {
+            } catch (e) {
                 alert("無效的代碼！");
             }
         }
