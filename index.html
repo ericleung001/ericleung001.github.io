@@ -112,7 +112,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v13</h1>
+    <h1>Pixel Tamagotchi - 熊仔 v14</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -159,6 +159,7 @@
         let frameIndex = 0;
         let savedCode = "";
         let lastSavedTime = new Date().getTime(); // 记录最后一次保存的时间
+        let lastLoadTime = 0; // 记录載入時間的時間戳
 
         const frames = {
             normal: [
@@ -283,28 +284,25 @@
             toiletBar.style.width = `${toilet}%`;
             boredomBar.style.width = `${boredom}%`;
             timeIndicator.textContent = `現在時間：${new Date().toLocaleTimeString()}`;
-            ageIndicator.textContent = `飼養日數：${age} 日`;
+            ageIndicator.textContent = `飼養日數：${Math.floor((new Date().getTime() - lastSavedTime) / (1000 * 60 * 60 * 24))} 日`;
         }
 
-        function updateRealTime() {
-            const currentTime = new Date().getTime();
-            const elapsedTime = (currentTime - lastSavedTime) / 1000; // 毫秒轉換為秒
-            if (elapsedTime >= 86400) { // 每24小時增加1天
-                age++;
-                lastSavedTime = currentTime;
+        function updatePetStatus() {
+            if (currentState !== "dead") {
+                if (!isSleeping) {
+                    hunger = Math.min(100, hunger + 1);
+                    toilet = Math.min(100, toilet + 1);
+                    boredom = Math.min(100, boredom + 1);
+                }
             }
             updateStatusBars();
         }
 
-        function updatePetStatus() {
-            if (currentState !== "dead" && !isSleeping) {
-                hunger = Math.min(100, hunger + 1);
-                toilet = Math.min(100, toilet + 1);
-                boredom = Math.min(100, boredom + 1);
-            }
-            if (currentState !== "dead") {
-                updateStatusBars();
-                checkDeath();
+        function updateRealTime() {
+            const currentTime = new Date().getTime();
+            if (currentTime - lastLoadTime > 1000) {
+                const elapsedTime = Math.floor((currentTime - lastSavedTime) / (1000 * 60 * 60 * 24)); // 每24小時為一天
+                age = elapsedTime;
             }
         }
 
@@ -312,7 +310,7 @@
             if (currentState !== "dead") {
                 hunger = Math.max(0, hunger - 20);
                 currentState = "eating";
-                setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000);
+                setTimeout(() => (currentState = "normal"), 3000);
             }
         }
 
@@ -360,6 +358,7 @@
                 boredom = parseInt(boredomValue, 10);
                 age = parseInt(ageValue, 10);
                 lastSavedTime = parseInt(lastSavedTimeValue, 10);
+                lastLoadTime = new Date().getTime();
                 alert("遊戲已載入！");
                 restartGame();
             } catch (e) {
