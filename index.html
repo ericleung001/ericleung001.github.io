@@ -319,14 +319,17 @@
                 age: age,
                 currentState: currentState
             };
-            localStorage.setItem("tamagotchiState", JSON.stringify(gameState));
+            const gameStateString = JSON.stringify(gameState);
+            const encodedGameState = btoa(gameStateString).slice(0, 8); // 編碼並截取8位字符
+            localStorage.setItem("tamagotchiState", encodedGameState);
             alert("遊戲進度已儲存！");
         }
 
         function loadGame() {
             const savedState = localStorage.getItem("tamagotchiState");
             if (savedState) {
-                const gameState = JSON.parse(savedState);
+                const decodedState = atob(savedState); // 解碼
+                const gameState = JSON.parse(decodedState);
                 hunger = gameState.hunger;
                 toilet = gameState.toilet;
                 boredom = gameState.boredom;
