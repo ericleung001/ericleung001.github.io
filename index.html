@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Pixel Tamagotchi - 熊仔">
-    <title>Pixel Tamagotchi - 熊仔v8</title>
+    <title>Pixel Tamagotchi - 熊仔</title>
     <style>
         body, html {
             font-family: Arial, sans-serif;
@@ -112,7 +112,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔v8</h1>
+    <h1>Pixel Tamagotchi - 熊仔 v9</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -157,6 +157,7 @@
         let isSleeping = false;
         let currentState = "normal"; // 用來追蹤目前狀態
         let frameIndex = 0;
+        let savedCode = "";
 
         const frames = {
             normal: [
@@ -381,21 +382,27 @@
         }
 
         function feedPet() {
-            hunger = Math.max(0, hunger - 30);
-            currentState = "eating";
-            setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000);
+            if (currentState !== "dead") {
+                hunger = Math.max(0, hunger - 20); 
+                currentState = "eating"; 
+                setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000); 
+            }
         }
 
         function playWithPet() {
-            boredom = Math.max(0, boredom - 30); 
-            currentState = "playing";
-            setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000); 
+            if (currentState !== "dead") {
+                boredom = Math.max(0, boredom - 20); 
+                currentState = "playing"; 
+                setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000); 
+            }
         }
 
         function cleanPet() {
-            toilet = Math.max(0, toilet - 30); 
-            currentState = "toilet";
-            setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000); 
+            if (currentState !== "dead") {
+                toilet = Math.max(0, toilet - 30); 
+                currentState = "toilet";
+                setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000); 
+            }
         }
 
         function restartGame() {
@@ -410,16 +417,17 @@
         }
 
         function saveGame() {
-            const code = Math.random().toString(36).substring(2, 10);
-            savedCodeDiv.textContent = `儲存代碼：${code}`;
+            savedCode = Math.random().toString(36).substring(2, 10); // 生成隨機8位代碼
+            savedCodeDiv.textContent = `儲存代碼：${savedCode}`;
         }
 
         function loadGame() {
             const code = loadCodeInput.value;
-            if (code.length === 8) {
+            if (code === savedCode) {
                 alert("遊戲已載入！");
+                restartGame();
             } else {
-                alert("請輸入有效的8位代碼！");
+                alert("無效的代碼！");
             }
         }
 
