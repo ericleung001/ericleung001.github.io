@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -112,7 +113,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v16</h1>
+    <h1>Pixel Tamagotchi - 熊仔 v19</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -319,13 +320,13 @@
             if (currentState !== "dead") {
                 boredom = Math.max(0, boredom - 20);
                 currentState = "playing";
-                setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000);
+                setTimeout(() => (currentState = "normal"), 3000);
             }
         }
 
         function cleanPet() {
             if (currentState !== "dead") {
-                toilet = Math.max(0, toilet - 30);
+                toilet = Math.max(0, toilet - 20);
                 currentState = "toilet";
                 setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000);
             }
