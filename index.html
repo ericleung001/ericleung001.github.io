@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -111,7 +112,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v15</h1>
+    <h1>Pixel Tamagotchi - 熊仔 v16</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -134,7 +135,7 @@
     </div>
 
     <div>
-        <input type="text" id="load-code-input" placeholder="輸入8位代碼" maxlength="8">
+        <input type="text" id="load-code-input" placeholder="輸入10位代碼" maxlength="10">
         <button onclick="loadGame()">載入進度</button>
     </div>
 
@@ -344,12 +345,26 @@
 
         function saveGame() {
             const gameData = `${hunger},${toilet},${boredom},${age},${new Date().getTime()}`;
-            savedCode = btoa(gameData); // 使用base64編碼儲存遊戲狀態
-            savedCodeDiv.textContent = `儲存代碼：${savedCode.substring(0, 8)}`; // 顯示前8位字符
+            savedCode = generateSaveCode(); // Generate the 10 character save code
+            savedCodeDiv.textContent = `儲存代碼：${savedCode}`; // 顯示完整的代碼
+        }
+
+        function generateSaveCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+';
+            let saveCode = '';
+            for (let i = 0; i < 10; i++) {
+                saveCode += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return saveCode;
         }
 
         function loadGame() {
             const code = loadCodeInput.value;
+            if (code.length !== 10) {
+                alert("無效的代碼，請確保代碼長度為10位！");
+                return;
+            }
+
             try {
                 const gameData = atob(code); // 解碼base64
                 const [hungerValue, toiletValue, boredomValue, ageValue, lastSavedTimeValue] = gameData.split(",");
@@ -358,7 +373,6 @@
                 boredom = parseInt(boredomValue, 10);
                 age = parseInt(ageValue, 10);
                 lastSavedTime = parseInt(lastSavedTimeValue, 10);
-                lastLoadTime = new Date().getTime();
                 alert("遊戲已載入！");
                 restartGame();
             } catch (e) {
