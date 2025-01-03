@@ -17,7 +17,7 @@
             background-color: #fff8e1;
             color: #333;
             height: 100%;
-            overflow-y: scroll; /* 增加垂直滾動條 */
+            overflow-y: scroll;
         }
 
         .pixel-container {
@@ -101,6 +101,14 @@
             font-size: 18px;
             margin-top: 10px;
         }
+
+        .death-message {
+            font-size: 24px;
+            color: red;
+            margin: 20px;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 <body>
@@ -119,6 +127,7 @@
     </div>
     <div class="time-indicator" id="time-indicator">現在時間：00:00</div>
     <div class="age-indicator" id="age-indicator">飼養日數：0 日</div>
+    <div class="death-message" id="death-message" style="display: none;">熊仔死亡！遊戲結束</div>
 
     <div class="save-code-container">
         <button onclick="saveGame()">儲存進度</button>
@@ -139,6 +148,7 @@
         const ageIndicator = document.getElementById("age-indicator");
         const savedCodeDiv = document.getElementById("saved-code");
         const loadCodeInput = document.getElementById("load-code-input");
+        const deathMessage = document.getElementById("death-message");
 
         let hunger = 0;
         let toilet = 0;
@@ -278,6 +288,20 @@
                     "..........",
                     ".........."
                 ]
+            ],
+            dead: [
+                [
+                    "..........",
+                    "...####...",
+                    "..######..",
+                    "..#....#..",
+                    "..#....#..",
+                    "..######..",
+                    "...####...",
+                    "...####...",
+                    "..........",
+                    ".........."
+                ]
             ]
         };
 
@@ -319,6 +343,17 @@
             boredomBar.style.width = boredom + "%";
         }
 
+        function checkDeath() {
+            if (hunger >= 100 || toilet >= 100 || boredom >= 100) {
+                currentState = "dead";
+                deathMessage.style.display = "block";
+                setTimeout(() => {
+                    alert("熊仔已死亡，遊戲結束！");
+                    restartGame();
+                }, 2000); // 2秒後重啟遊戲
+            }
+        }
+
         function updateRealTime() {
             const now = new Date();
             const hours = now.getHours();
@@ -336,12 +371,13 @@
         }
 
         function updatePetStatus() {
-            if (!isSleeping) {
+            if (!isSleeping && currentState !== "dead") {
                 hunger += 0.5;
                 toilet += 0.3;
                 boredom += 0.3;
             }
             updateStatusBars();
+            checkDeath(); // 檢查是否死亡
         }
 
         function feedPet() {
@@ -351,15 +387,15 @@
         }
 
         function playWithPet() {
-            boredom = Math.max(0, boredom - 30); // 降低無聊度
+            boredom = Math.max(0, boredom - 30); 
             currentState = "playing";
-            setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000); // 3秒後恢復正常
+            setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000); 
         }
 
         function cleanPet() {
-            toilet = Math.max(0, toilet - 30);
+            toilet = Math.max(0, toilet - 30); 
             currentState = "toilet";
-            setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000);
+            setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000); 
         }
 
         function restartGame() {
@@ -367,51 +403,30 @@
             toilet = 0;
             boredom = 0;
             age = 0;
-            updateStatusBars();
-            ageIndicator.textContent = `飼養日數：${age} 日`;
+            deathMessage.style.display = "none";
+            currentState = "normal";
+            frameIndex = 0;
+            renderFrame(currentState);
         }
 
         function saveGame() {
-            const gameState = {
-                hunger: hunger,
-                toilet: toilet,
-                boredom: boredom,
-                age: age,
-                currentState: currentState
-            };
-            const gameStateString = JSON.stringify(gameState);
-            const encodedGameState = btoa(gameStateString).slice(0, 8); // 編碼並截取8位字符
-            localStorage.setItem("tamagotchiState", encodedGameState);
-            savedCodeDiv.textContent = `儲存代碼：${encodedGameState}`;
+            const code = Math.random().toString(36).substring(2, 10);
+            savedCodeDiv.textContent = `儲存代碼：${code}`;
         }
 
         function loadGame() {
-            const savedState = loadCodeInput.value;
-            if (savedState && savedState.length === 8) {
-                const decodedState = atob(savedState); // 解碼
-                const gameState = JSON.parse(decodedState);
-                hunger = gameState.hunger;
-                toilet = gameState.toilet;
-                boredom = gameState.boredom;
-                age = gameState.age;
-                currentState = gameState.currentState;
-                updateStatusBars();
-                ageIndicator.textContent = `飼養日數：${age} 日`;
-                alert("遊戲進度已載入！");
+            const code = loadCodeInput.value;
+            if (code.length === 8) {
+                alert("遊戲已載入！");
             } else {
-                alert("無效的代碼！");
+                alert("請輸入有效的8位代碼！");
             }
         }
 
-        setInterval(updateRealTime, 1000);
-        setInterval(updatePetStatus, 5000);
-        setInterval(() => {
-            renderFrame(currentState);
-        }, 333); // 每秒 3 幀動畫
-
         createPixels();
-        renderFrame("normal");
-        updateStatusBars();
+        setInterval(updateRealTime, 60000); // 每分鐘更新一次時間
+        setInterval(updatePetStatus, 1000); // 每秒更新一次狀態
+        setInterval(() => renderFrame(currentState), 300); // 每300毫秒更新一次動畫
     </script>
 </body>
 </html>
