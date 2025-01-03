@@ -325,7 +325,7 @@
             }
         }
 
-        function saveGame() {
+function saveGame() {
     const saveData = {
         hunger,
         toilet,
@@ -336,7 +336,7 @@
     saveInput.value = btoa(JSON.stringify(saveData)); // 將數據編碼為 Base64
 }
 
-        function loadGame() {
+function loadGame() {
     try {
         const saveData = JSON.parse(atob(saveInput.value)); // 解碼存檔數據
         const savedDate = new Date(saveData.startDate); // 儲存日期
