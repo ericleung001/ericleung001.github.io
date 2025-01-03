@@ -86,6 +86,11 @@
             margin: 10px 0;
             font-weight: bold;
         }
+
+        .save-code-container {
+            margin: 20px;
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
@@ -96,8 +101,6 @@
         <button onclick="playWithPet()">陪玩</button>
         <button onclick="cleanPet()">清潔</button>
         <button onclick="restartGame()">重新開始</button>
-        <button onclick="saveGame()">儲存進度</button>
-        <button onclick="loadGame()">載入進度</button>
     </div>
     <div class="status-container">
         <div>肚餓：<div class="status-bar"><div id="hunger-bar" class="status-bar-inner"></div></div></div>
@@ -106,6 +109,17 @@
     </div>
     <div class="time-indicator" id="time-indicator">現在時間：00:00</div>
     <div class="age-indicator" id="age-indicator">飼養日數：0 日</div>
+
+    <div class="save-code-container">
+        <button onclick="saveGame()">儲存進度</button>
+        <div id="saved-code" style="margin-top: 10px;"></div>
+    </div>
+
+    <div>
+        <input type="text" id="load-code-input" placeholder="輸入8位代碼" maxlength="8">
+        <button onclick="loadGame()">載入進度</button>
+    </div>
+
     <script>
         const pixelPet = document.getElementById("pixel-pet");
         const hungerBar = document.getElementById("hunger-bar");
@@ -113,6 +127,8 @@
         const boredomBar = document.getElementById("boredom-bar");
         const timeIndicator = document.getElementById("time-indicator");
         const ageIndicator = document.getElementById("age-indicator");
+        const savedCodeDiv = document.getElementById("saved-code");
+        const loadCodeInput = document.getElementById("load-code-input");
 
         let hunger = 0;
         let toilet = 0;
@@ -322,12 +338,12 @@
             const gameStateString = JSON.stringify(gameState);
             const encodedGameState = btoa(gameStateString).slice(0, 8); // 編碼並截取8位字符
             localStorage.setItem("tamagotchiState", encodedGameState);
-            alert("遊戲進度已儲存！");
+            savedCodeDiv.textContent = `儲存代碼：${encodedGameState}`;
         }
 
         function loadGame() {
-            const savedState = localStorage.getItem("tamagotchiState");
-            if (savedState) {
+            const savedState = loadCodeInput.value;
+            if (savedState && savedState.length === 8) {
                 const decodedState = atob(savedState); // 解碼
                 const gameState = JSON.parse(decodedState);
                 hunger = gameState.hunger;
@@ -339,7 +355,7 @@
                 ageIndicator.textContent = `飼養日數：${age} 日`;
                 alert("遊戲進度已載入！");
             } else {
-                alert("無儲存的遊戲進度！");
+                alert("無效的代碼！");
             }
         }
 
