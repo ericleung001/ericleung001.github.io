@@ -112,7 +112,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v10</h1>
+    <h1>Pixel Tamagotchi - 熊仔 v11</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -335,37 +335,22 @@
                     pixels[i].classList.remove("active", "eye", "food", "toilet", "sleep", "play");
                 }
             }
-            frameIndex++;
         }
 
         function updateStatusBars() {
-            hungerBar.style.width = hunger + "%";
-            toiletBar.style.width = toilet + "%";
-            boredomBar.style.width = boredom + "%";
-        }
-
-        function checkDeath() {
-            if (hunger >= 100 || toilet >= 100 || boredom >= 100) {
-                currentState = "dead";
-                deathMessage.style.display = "block";
-                setTimeout(() => {
-                    alert("熊仔已死亡，遊戲結束！");
-                    restartGame();
-                }, 2000); // 2秒後重啟遊戲
-            }
+            hungerBar.style.width = `${hunger}%`;
+            toiletBar.style.width = `${toilet}%`;
+            boredomBar.style.width = `${boredom}%`;
+            timeIndicator.textContent = `現在時間：${new Date().toLocaleTimeString()}`;
+            ageIndicator.textContent = `飼養日數：${age} 日`;
         }
 
         function updateRealTime() {
-            const now = new Date();
-            const hours = now.getHours();
-            const minutes = now.getMinutes();
-            const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
-            timeIndicator.textContent = `現在時間：${formattedTime}`;
-
-            if (hours >= 21 || hours < 8) {
+            const currentTime = new Date();
+            if (currentTime.getHours() === 9 && !isSleeping) {
                 isSleeping = true;
                 currentState = "sleeping";
-            } else {
+            } else if (currentTime.getHours() === 8) {
                 isSleeping = false;
             }
 
@@ -424,7 +409,7 @@
         function saveGame() {
             const gameData = `${hunger},${toilet},${boredom},${age}`;
             savedCode = btoa(gameData); // 使用base64編碼儲存遊戲狀態
-            savedCodeDiv.textContent = `儲存代碼：${savedCode}`;
+            savedCodeDiv.textContent = `儲存代碼：${savedCode.substring(0, 8)}`; // 顯示前8位字符
         }
 
         function loadGame() {
