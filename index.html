@@ -73,7 +73,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v22</h1>
+    <h1>Pixel Tamagotchi - 熊仔 ver.c01</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -395,7 +395,7 @@
                 updateAnimation();
                 updateStatusBars();
 
-                if (hunger >= 100 || toilet >= 100 || boredom >= 100) {
+                if (hunger >= 150 || toilet >= 180 || boredom >= 200) {
                     dead = true;
                     alert("熊仔死了");
                 }
