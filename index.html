@@ -96,6 +96,8 @@
         <button onclick="playWithPet()">陪玩</button>
         <button onclick="cleanPet()">清潔</button>
         <button onclick="restartGame()">重新開始</button>
+        <button onclick="saveGame()">儲存進度</button>
+        <button onclick="loadGame()">載入進度</button>
     </div>
     <div class="status-container">
         <div>肚餓：<div class="status-bar"><div id="hunger-bar" class="status-bar-inner"></div></div></div>
@@ -307,6 +309,35 @@
             age = 0;
             updateStatusBars();
             ageIndicator.textContent = `飼養日數：${age} 日`;
+        }
+
+        function saveGame() {
+            const gameState = {
+                hunger: hunger,
+                toilet: toilet,
+                boredom: boredom,
+                age: age,
+                currentState: currentState
+            };
+            localStorage.setItem("tamagotchiState", JSON.stringify(gameState));
+            alert("遊戲進度已儲存！");
+        }
+
+        function loadGame() {
+            const savedState = localStorage.getItem("tamagotchiState");
+            if (savedState) {
+                const gameState = JSON.parse(savedState);
+                hunger = gameState.hunger;
+                toilet = gameState.toilet;
+                boredom = gameState.boredom;
+                age = gameState.age;
+                currentState = gameState.currentState;
+                updateStatusBars();
+                ageIndicator.textContent = `飼養日數：${age} 日`;
+                alert("遊戲進度已載入！");
+            } else {
+                alert("無儲存的遊戲進度！");
+            }
         }
 
         setInterval(updateRealTime, 1000);
