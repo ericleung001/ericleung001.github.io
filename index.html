@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -9,15 +8,12 @@
     <meta name="apple-mobile-web-app-title" content="Pixel Tamagotchi - 熊仔">
     <title>Pixel Tamagotchi - 熊仔</title>
     <style>
-        body, html {
+        body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin: 0;
-            padding: 0;
+            margin: 20px;
             background-color: #fff8e1;
             color: #333;
-            height: 100%;
-            overflow-y: scroll;
         }
 
         .pixel-container {
@@ -40,18 +36,6 @@
 
         .eye {
             background-color: #000;
-        }
-
-        .food {
-            background-color: #ffa500;
-        }
-
-        .toilet {
-            background-color: #008000;
-        }
-
-        .sleep {
-            background-color: #222;
         }
 
         button, input {
@@ -86,39 +70,19 @@
             margin: 10px 0;
             font-weight: bold;
         }
-
-        .save-code-container {
-            margin: 20px;
-            font-size: 18px;
-        }
-
-        #load-code-input {
-            font-size: 18px;
-            margin: 10px;
-        }
-
-        #saved-code {
-            font-size: 18px;
-            margin-top: 10px;
-        }
-
-        .death-message {
-            font-size: 24px;
-            color: red;
-            margin: 20px;
-            font-weight: bold;
-        }
-
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v17</h1>
+    <h1>Pixel Tamagotchi - 熊仔</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
         <button onclick="playWithPet()">陪玩</button>
         <button onclick="cleanPet()">清潔</button>
         <button onclick="restartGame()">重新開始</button>
+        <input id="save-input" type="text" placeholder="輸入儲存代碼">
+        <button onclick="saveGame()">儲存遊戲</button>
+        <button onclick="loadGame()">載入存檔</button>
     </div>
     <div class="status-container">
         <div>肚餓：<div class="status-bar"><div id="hunger-bar" class="status-bar-inner"></div></div></div>
@@ -127,18 +91,6 @@
     </div>
     <div class="time-indicator" id="time-indicator">現在時間：00:00</div>
     <div class="age-indicator" id="age-indicator">飼養日數：0 日</div>
-    <div class="death-message" id="death-message" style="display: none;">熊仔死亡！遊戲結束</div>
-
-    <div class="save-code-container">
-        <button onclick="saveGame()">儲存進度</button>
-        <div id="saved-code"></div>
-    </div>
-
-    <div>
-        <input type="text" id="load-code-input" placeholder="輸入10位代碼" maxlength="10">
-        <button onclick="loadGame()">載入進度</button>
-    </div>
-
     <script>
         const pixelPet = document.getElementById("pixel-pet");
         const hungerBar = document.getElementById("hunger-bar");
@@ -146,24 +98,31 @@
         const boredomBar = document.getElementById("boredom-bar");
         const timeIndicator = document.getElementById("time-indicator");
         const ageIndicator = document.getElementById("age-indicator");
-        const savedCodeDiv = document.getElementById("saved-code");
-        const loadCodeInput = document.getElementById("load-code-input");
-        const deathMessage = document.getElementById("death-message");
+        const saveInput = document.getElementById("save-input");
 
         let hunger = 0;
         let toilet = 0;
         let boredom = 0;
-        let age = 0;
+        let currentFrameIndex = 0;
+        let currentState = "idle";
+        let startDate = new Date();
+        let dead = false;
         let isSleeping = false;
-        let currentState = "normal"; // 用來追蹤目前狀態
-        let frameIndex = 0;
-        let savedCode = "";
-        let lastSavedTime = new Date().getTime(); // 记录最后一次保存的时间
-        let lastLoadTime = 0; // 记录載入時間的時間戳
-        let lastGameTime = 0; // 记录遊戲开始的時間
 
         const frames = {
-            normal: [
+            idle: [
+                [
+                    "..........",
+                    "...####...",
+                    "..######..",
+                    "..#....#..",
+                    "..#.O..#..",
+                    "..######..",
+                    "...#..#...",
+                    "...####...",
+                    "..........",
+                    ".........."
+                ],
                 [
                     "..........",
                     "...####...",
@@ -175,18 +134,54 @@
                     "...####...",
                     "..........",
                     ".........."
+                ],
+                [
+                    "..........",
+                    "...####...",
+                    "..######..",
+                    "..#....#..",
+                    "..#.O..#..",
+                    "..######..",
+                    "...#..#...",
+                    "...####...",
+                    "..........",
+                    ".........."
                 ]
             ],
-            eating: [
+            hungry: [
+                [
+                    "..........",
+                    "...####...",
+                    "..######..",
+                    "..#....#..",
+                    "..#.O..#..",
+                    "..######..",
+                    "....#....#",
+                    "...######.",
+                    "..........",
+                    ".........."
+                ],
                 [
                     "..........",
                     "...####...",
                     "..######..",
                     "..#....#..",
                     "..#..O.#..",
-                    "..##FOOD..",
-                    "...#..#...",
+                    "..######..",
+                    "....#....#",
+                    "...######.",
+                    "..........",
+                    ".........."
+                ],
+                [
+                    "..........",
                     "...####...",
+                    "..######..",
+                    "..#....#..",
+                    "..#..O.#..",
+                    "..######..",
+                    "...#....#.",
+                    "...######.",
                     "..........",
                     ".........."
                 ]
@@ -197,10 +192,34 @@
                     "...####...",
                     "..######..",
                     "..#....#..",
-                    "..#.O..#..",
+                    "..#.P..#..",
                     "..######..",
-                    "...#💧.#...",
+                    "...######.",
+                    "...######.",
+                    "..........",
+                    ".........."
+                ],
+                [
+                    "..........",
                     "...####...",
+                    "..######..",
+                    "..#....#..",
+                    "..#.P..#..",
+                    "..######..",
+                    "....#####.",
+                    "...######.",
+                    "..........",
+                    ".........."
+                ],
+                [
+                    "..........",
+                    "...####...",
+                    "..######..",
+                    "..#....#..",
+                    "..#.P..#..",
+                    "..######..",
+                    "....#####.",
+                    "...######.",
                     "..........",
                     ".........."
                 ]
@@ -208,32 +227,16 @@
             sleeping: [
                 [
                     "..........",
-                    "...ZZZZ...",
-                    "..Z....Z..",
-                    "..Z....Z..",
-                    "...ZZZZ...",
-                    "..........",
-                    "..........",
-                    "..........",
-                    "..........",
-                    ".........."
-                ]
-            ],
-            playing: [
-                [
-                    "..........",
                     "...####...",
                     "..######..",
                     "..#....#..",
-                    "..#..O.#..",
-                    "..##PLAY..",
-                    "...#..#...",
-                    "...####...",
+                    "..#....#..",
+                    "..######..",
+                    "....####..",
+                    "....####..",
                     "..........",
                     ".........."
-                ]
-            ],
-            dead: [
+                ],
                 [
                     "..........",
                     "...####...",
@@ -241,8 +244,20 @@
                     "..#....#..",
                     "..#....#..",
                     "..######..",
+                    "....####..",
+                    "....####..",
+                    "..........",
+                    ".........."
+                ],
+                [
+                    "..........",
                     "...####...",
-                    "...####...",
+                    "..######..",
+                    "..#....#..",
+                    "..#....#..",
+                    "..######..",
+                    "....####..",
+                    "....####..",
                     "..........",
                     ".........."
                 ]
@@ -257,140 +272,141 @@
             }
         }
 
-        function renderFrame(frameType) {
+        function renderFrame(state) {
             const pixels = document.querySelectorAll(".pixel");
-            const frame = frames[frameType][frameIndex % frames[frameType].length];
-            const rows = frame.join("");
+            const currentFrame = frames[state][currentFrameIndex];
+            const rows = currentFrame.join("");
             for (let i = 0; i < pixels.length; i++) {
                 if (rows[i] === "#") {
                     pixels[i].classList.add("active");
-                } else if (rows[i] === "O") {
+                } else if (rows[i] === "O" || rows[i] === "P") {
                     pixels[i].classList.add("eye");
-                } else if (rows[i] === "F") {
-                    pixels[i].classList.add("food");
-                } else if (rows[i] === "💧") {
-                    pixels[i].classList.add("toilet");
-                } else if (rows[i] === "Z") {
-                    pixels[i].classList.add("sleep");
-                } else if (rows[i] === "P") {
-                    pixels[i].classList.add("play");
                 } else {
-                    pixels[i].classList.remove("active", "eye", "food", "toilet", "sleep", "play");
+                    pixels[i].classList.remove("active", "eye");
                 }
+            }
+        }
+
+        function updateAnimation() {
+            currentFrameIndex = (currentFrameIndex + 1) % frames[currentState].length;
+            renderFrame(currentState);
+        }
+
+        function updateState() {
+            const hours = new Date().getHours();
+            if (hours >= 21 || hours < 8) {
+                currentState = "sleeping";
+                isSleeping = true;
+            } else {
+                isSleeping = false;
+                if (hunger >= 80) {
+                    currentState = "hungry";
+                } else if (toilet >= 80) {
+                    currentState = "toilet";
+                } else {
+                    currentState = "idle";
+                }
+            }
+        }
+
+        function updateRealTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const elapsedDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+            timeIndicator.textContent = `現在時間：${hours}:${minutes}`;
+            ageIndicator.textContent = `飼養日數：${elapsedDays} 日`;
+
+            // Check if it's sleeping time
+            if (hours >= 21 || hours < 8) {
+                isSleeping = true;
+            } else {
+                isSleeping = false;
+            }
+        }
+
+        function saveGame() {
+            const saveData = {
+                hunger,
+                toilet,
+                boredom,
+                startDate,
+                isSleeping
+            };
+            saveInput.value = btoa(JSON.stringify(saveData));
+        }
+
+        function loadGame() {
+            try {
+                const saveData = JSON.parse(atob(saveInput.value));
+                hunger = saveData.hunger;
+                toilet = saveData.toilet;
+                boredom = saveData.boredom;
+                startDate = new Date(saveData.startDate);
+                isSleeping = saveData.isSleeping;
+                updateAnimation();
+                updateRealTime();
+            } catch {
+                alert("無效的存檔代碼");
             }
         }
 
         function updateStatusBars() {
-            hungerBar.style.width = `${hunger}%`;
-            toiletBar.style.width = `${toilet}%`;
-            boredomBar.style.width = `${boredom}%`;
-            timeIndicator.textContent = `現在時間：${new Date().toLocaleTimeString()}`;
-            ageIndicator.textContent = `飼養日數：${age} 日`;
-        }
-
-        function updatePetStatus() {
-            if (currentState !== "dead") {
-                if (!isSleeping) {
-                    hunger = Math.min(100, hunger + 1);
-                    toilet = Math.min(100, toilet + 1);
-                    boredom = Math.min(100, boredom + 1);
-                }
-            }
-            updateStatusBars();
-        }
-
-        function updateRealTime() {
-            const currentTime = new Date().getTime();
-            if (currentTime - lastSavedTime > 24 * 60 * 60 * 1000) {
-                age++;
-                lastSavedTime = currentTime;
-            }
-            if (currentState === "sleeping") {
-                frameIndex += 2;
-            } else {
-                frameIndex++;
-            }
-            renderFrame(currentState);
+            hungerBar.style.width = hunger + "%";
+            toiletBar.style.width = toilet + "%";
+            boredomBar.style.width = boredom + "%";
         }
 
         function feedPet() {
-            if (currentState !== "dead") {
-                hunger = Math.max(0, hunger - 20);
-                currentState = "eating";
-                setTimeout(() => (currentState = "normal"), 3000);
-            }
+            if (!dead) hunger = Math.max(0, hunger - 30);
         }
 
         function playWithPet() {
-            if (currentState !== "dead") {
-                boredom = Math.max(0, boredom - 20);
-                currentState = "playing";
-                setTimeout(() => (currentState = "normal"), 3000);
-            }
+            if (!dead) boredom = Math.max(0, boredom - 30);
         }
 
         function cleanPet() {
-            if (currentState !== "dead") {
-                toilet = Math.max(0, toilet - 20);
-                currentState = "toilet";
-                setTimeout(() => (currentState = isSleeping ? "sleeping" : "normal"), 3000);
-            }
+            if (!dead) toilet = Math.max(0, toilet - 30);
         }
 
         function restartGame() {
             hunger = 0;
             toilet = 0;
             boredom = 0;
-            age = 0;
-            deathMessage.style.display = "none";
-            currentState = "normal";
-            frameIndex = 0;
+            currentState = "idle";
+            startDate = new Date();
+            dead = false;
             renderFrame(currentState);
-            updateRealTime();
+            updateStatusBars();
         }
 
-        function saveGame() {
-            const gameData = `${hunger},${toilet},${boredom},${age},${new Date().getTime()}`;
-            savedCode = generateSaveCode(); // Generate the 10 character save code
-            savedCodeDiv.textContent = `儲存代碼：${savedCode}`; // 顯示完整的代碼
-            localStorage.setItem(savedCode, gameData);  // Store game data under the generated code
-        }
+        setInterval(() => {
+            if (!dead) {
+                updateRealTime();
+                let hungerSpeed = isSleeping ? 0.2 : 1;
+                let toiletSpeed = isSleeping ? 0.1 : 0.5;
+                let boredomSpeed = isSleeping ? 0.1 : 0.5;
 
-        function generateSaveCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+';
-            let saveCode = '';
-            for (let i = 0; i < 10; i++) {
-                saveCode += chars.charAt(Math.floor(Math.random() * chars.length));
+                hunger += hungerSpeed;
+                toilet += toiletSpeed;
+                boredom += boredomSpeed;
+
+                updateState();
+                updateAnimation();
+                updateStatusBars();
+
+                if (hunger >= 100 || toilet >= 100 || boredom >= 100) {
+                    dead = true;
+                    alert("熊仔死了");
+                }
             }
-            return saveCode;
-        }
-
-        function loadGame() {
-            const code = loadCodeInput.value;
-            if (code.length !== 10) {
-                alert("無效的代碼，請確保代碼長度為10位！");
-                return;
-            }
-
-            const savedData = localStorage.getItem(code);
-            if (savedData) {
-                const [hungerValue, toiletValue, boredomValue, ageValue, lastSavedTimeValue] = savedData.split(",");
-                hunger = parseInt(hungerValue, 10);
-                toilet = parseInt(toiletValue, 10);
-                boredom = parseInt(boredomValue, 10);
-                age = parseInt(ageValue, 10);
-                lastSavedTime = parseInt(lastSavedTimeValue, 10);
-                alert("遊戲已載入！");
-                restartGame();
-            } else {
-                alert("無效的代碼！");
-            }
-        }
+        }, isSleeping ? 500 : 1000); // Sleep state updates twice per second, otherwise once per second
 
         createPixels();
-        setInterval(updateRealTime, 1000); // 每秒更新一次時間
-        setInterval(updatePetStatus, 1000); // 每秒更新一次狀態
-        setInterval(() => renderFrame(currentState), 300); // 每300毫秒更新一次動畫
+        updateAnimation();
+        updateStatusBars();
+        updateRealTime();
     </script>
 </body>
 </html>
+
