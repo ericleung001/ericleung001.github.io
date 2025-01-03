@@ -73,7 +73,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v14</h1>
+    <h1>Pixel Tamagotchi - 熊仔 v15</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -330,7 +330,8 @@ function saveGame() {
         hunger,
         toilet,
         boredom,
-        startDate: startDate.toISOString(), // 確保儲存的是 ISO 格式的日期
+        startDate: startDate.toISOString(), // 起始日期
+        saveDate: new Date().toISOString(), // 當前儲存時間
         isSleeping
     };
     saveInput.value = btoa(JSON.stringify(saveData)); // 將數據編碼為 Base64
@@ -339,14 +340,14 @@ function saveGame() {
 function loadGame() {
     try {
         const saveData = JSON.parse(atob(saveInput.value)); // 解碼存檔數據
-        const savedDate = new Date(saveData.startDate); // 儲存日期
-        const now = new Date(); // 現在日期
+        const savedDate = new Date(saveData.saveDate); // 儲存時間
+        const now = new Date(); // 當前時間
         const elapsedMinutes = Math.floor((now - savedDate) / (1000 * 60)); // 計算分鐘差距
 
         // 更新狀態值，根據時間差距增加數值
-        hunger = Math.min(300, saveData.hunger + elapsedMinutes * (5 / 8)); // 每天增加5，換算到每分鐘增加5/1440
-        toilet = Math.min(300, saveData.toilet + elapsedMinutes * (4 / 8)); // 每天增加4，換算到每分鐘增加4/1440
-        boredom = Math.min(350, saveData.boredom + elapsedMinutes * (1 / 10)); // 每天增加6，換算到每分鐘增加6/1440
+        hunger = Math.min(150, saveData.hunger + elapsedMinutes * (5 / 8)); // 每天增加5，換算到每分鐘增加5/1440
+        toilet = Math.min(180, saveData.toilet + elapsedMinutes * (4 / 8)); // 每天增加4，換算到每分鐘增加4/1440
+        boredom = Math.min(200, saveData.boredom + elapsedMinutes * (1 / 10)); // 每天增加6，換算到每分鐘增加6/1440
 
         startDate = new Date(saveData.startDate); // 恢復存檔的起始日期
         isSleeping = saveData.isSleeping; // 恢復睡眠狀態
@@ -360,6 +361,7 @@ function loadGame() {
         alert("無效的存檔代碼");
     }
 }
+
 
         function updateStatusBars() {
             hungerBar.style.width = hunger + "%";
