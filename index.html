@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -113,7 +112,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v19</h1>
+    <h1>Pixel Tamagotchi - 熊仔 v17</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -302,10 +301,16 @@
 
         function updateRealTime() {
             const currentTime = new Date().getTime();
-            if (currentTime - lastSavedTime > 1000) {
-                const elapsedTime = Math.floor((currentTime - lastSavedTime) / (1000 * 60 * 60 * 24)); // 每24小時為一天
-                age = elapsedTime;
+            if (currentTime - lastSavedTime > 24 * 60 * 60 * 1000) {
+                age++;
+                lastSavedTime = currentTime;
             }
+            if (currentState === "sleeping") {
+                frameIndex += 2;
+            } else {
+                frameIndex++;
+            }
+            renderFrame(currentState);
         }
 
         function feedPet() {
@@ -348,6 +353,7 @@
             const gameData = `${hunger},${toilet},${boredom},${age},${new Date().getTime()}`;
             savedCode = generateSaveCode(); // Generate the 10 character save code
             savedCodeDiv.textContent = `儲存代碼：${savedCode}`; // 顯示完整的代碼
+            localStorage.setItem(savedCode, gameData);  // Store game data under the generated code
         }
 
         function generateSaveCode() {
@@ -366,9 +372,9 @@
                 return;
             }
 
-            try {
-                const gameData = atob(code); // 解碼base64
-                const [hungerValue, toiletValue, boredomValue, ageValue, lastSavedTimeValue] = gameData.split(",");
+            const savedData = localStorage.getItem(code);
+            if (savedData) {
+                const [hungerValue, toiletValue, boredomValue, ageValue, lastSavedTimeValue] = savedData.split(",");
                 hunger = parseInt(hungerValue, 10);
                 toilet = parseInt(toiletValue, 10);
                 boredom = parseInt(boredomValue, 10);
@@ -376,7 +382,7 @@
                 lastSavedTime = parseInt(lastSavedTimeValue, 10);
                 alert("遊戲已載入！");
                 restartGame();
-            } catch (e) {
+            } else {
                 alert("無效的代碼！");
             }
         }
