@@ -73,7 +73,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v21</h1>
+    <h1>Pixel Tamagotchi - 熊仔 v22</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -345,9 +345,9 @@ function loadGame() {
         const elapsedMinutes = Math.floor((now - savedDate) / (1000 * 60)); // 計算分鐘差距
 
         // 更新狀態值，根據時間差距增加數值
-        hunger = Math.min(450, saveData.hunger + elapsedMinutes * (5 / 80)); // 每天增加5，換算到每分鐘增加5/1440
-        toilet = Math.min(450, saveData.toilet + elapsedMinutes * (4 / 80)); // 每天增加4，換算到每分鐘增加4/1440
-        boredom = Math.min(550, saveData.boredom + elapsedMinutes * (6 / 80)); // 每天增加6，換算到每分鐘增加6/1440
+        hunger = Math.min(450, saveData.hunger + elapsedMinutes * (5 / 40)); // 每天增加5，換算到每分鐘增加5/1440
+        toilet = Math.min(450, saveData.toilet + elapsedMinutes * (4 / 40)); // 每天增加4，換算到每分鐘增加4/1440
+        boredom = Math.min(550, saveData.boredom + elapsedMinutes * (6 / 40)); // 每天增加6，換算到每分鐘增加6/1440
 
         startDate = new Date(saveData.startDate); // 恢復存檔的起始日期
         isSleeping = saveData.isSleeping; // 恢復睡眠狀態
@@ -395,9 +395,9 @@ function loadGame() {
         setInterval(() => {
             if (!dead) {
                 updateRealTime();
-                let hungerSpeed = isSleeping ? 0.03 : 0.08;
-                let toiletSpeed = isSleeping ? 0.03 : 0.08;
-                let boredomSpeed = isSleeping ? 0 : 0.05;
+                let hungerSpeed = isSleeping ? 0.03 : 0.09;
+                let toiletSpeed = isSleeping ? 0.03 : 0.09;
+                let boredomSpeed = isSleeping ? 0 : 0.07;
 
                 hunger += hungerSpeed;
                 toilet += toiletSpeed;
