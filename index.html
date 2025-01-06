@@ -104,7 +104,7 @@
         let toilet = 0;
         let boredom = 0;
         let currentFrameIndex = 0;
-        let currentState = "sleeping";
+        let currentState = "idle";
         let startDate = new Date();
         let dead = false;
         let isSleeping = false;
@@ -294,7 +294,7 @@
 
         function updateState() {
             const hours = new Date().getHours();
-            if (hours >= 21 || hours < 8) {
+            if (hours >= 8 || hours < 21) {
                 currentState = "sleeping";
                 isSleeping = true;
             } else {
