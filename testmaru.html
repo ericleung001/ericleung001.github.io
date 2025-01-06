@@ -443,9 +443,9 @@ function loadGame() {
         setInterval(() => {
             if (!dead) {
                 updateRealTime();
-                let hungerSpeed = isSleeping ? 0.03 : 0.09; //0.09
-                let toiletSpeed = isSleeping ? 0.03 : 0.09; //0.09
-                let boredomSpeed = isSleeping ? 0 : 0.07; //0.07
+                let hungerSpeed = isSleeping ? 0.03 : 5; //0.09
+                let toiletSpeed = isSleeping ? 0.03 : 3; //0.09
+                let boredomSpeed = isSleeping ? 0 : 4; //0.07
 
                 hunger += hungerSpeed;
                 toilet += toiletSpeed;
@@ -472,7 +472,7 @@ function loadGame() {
     <h5>注意：</h5>
     <h5>1.iOSのホーム画面にウェブページを追加すると、フルスクリーン表示が可能です。</h5>
     <h5>2.ゲームを保存する際には、文字列をコピーする必要があります。すべての文字が選択されているか確認してください。</h5>
-    <h6>test_v1</h6>
+    <h6>test_v2</h6>
 </body>
 </html>
 
