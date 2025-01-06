@@ -73,7 +73,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel丸之内 - v42</h1>
+    <h1>Pixel丸之内 - v43</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餌を与える</button>
@@ -355,8 +355,8 @@
             const hours = now.getHours().toString().padStart(2, '0');
             const minutes = now.getMinutes().toString().padStart(2, '0');
             const elapsedDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
-            timeIndicator.textContent = `現在時間：${hours}:${minutes}`;
-            ageIndicator.textContent = `飼養日數：${elapsedDays} 日`;
+            timeIndicator.textContent = `現在の時間：${hours}:${minutes}`;
+            ageIndicator.textContent = `飼育日数：${elapsedDays} 日`;
 
             // Check if it's sleeping time
             if (hours >= 21 || hours < 8) {
