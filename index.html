@@ -73,24 +73,24 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v41</h1>
+    <h1>Pixel丸之内 - v42</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
-        <button onclick="feedPet()">餵食</button>
-        <button onclick="playWithPet()">陪玩</button>
-        <button onclick="cleanPet()">清潔</button>
-        <button onclick="restartGame()">重新開始</button>
-        <input id="save-input" type="text" placeholder="輸入儲存代碼">
-        <button onclick="saveGame()">儲存遊戲</button>
-        <button onclick="loadGame()">載入存檔</button>
+        <button onclick="feedPet()">餌を与える</button>
+        <button onclick="playWithPet()">遊ぶ</button>
+        <button onclick="cleanPet()">掃除する</button>
+        <button onclick="restartGame()">再スタート</button>
+        <input id="save-input" type="text" placeholder="保存コードを入力">
+        <button onclick="saveGame()">ゲームを保存</button>
+        <button onclick="loadGame()">保存を読み込む</button>
     </div>
     <div class="status-container">
-        <div>肚餓：<div class="status-bar"><div id="hunger-bar" class="status-bar-inner"></div></div></div>
-        <div>廁所：<div class="status-bar"><div id="toilet-bar" class="status-bar-inner"></div></div></div>
-        <div>悶：<div class="status-bar"><div id="boredom-bar" class="status-bar-inner"></div></div></div>
+        <div>空腹：<div class="status-bar"><div id="hunger-bar" class="status-bar-inner"></div></div></div>
+        <div>トイレ：<div class="status-bar"><div id="toilet-bar" class="status-bar-inner"></div></div></div>
+        <div>退屈：<div class="status-bar"><div id="boredom-bar" class="status-bar-inner"></div></div></div>
     </div>
-    <div class="time-indicator" id="time-indicator">現在時間：00:00</div>
-    <div class="age-indicator" id="age-indicator">飼養日數：0 日</div>
+    <div class="time-indicator" id="time-indicator">現在の時間：00:00</div>
+    <div class="age-indicator" id="age-indicator">飼育日数：0 日</div>
     <script>
         const pixelPet = document.getElementById("pixel-pet");
         const hungerBar = document.getElementById("hunger-bar");
@@ -397,9 +397,9 @@ function loadGame() {
         updateRealTime(); // 更新時間顯示
         updateStatusBars(); // 更新狀態條
 
-        alert(`遊戲已載入，經過了 ${elapsedMinutes} 分鐘！`); // 顯示載入資訊
+        alert(`ゲームがロードされました。${elapsedMinutes} 分が経過しました！`); // 顯示載入資訊
     } catch {
-        alert("無效的存檔代碼");
+        alert("無効なセーブコードです。");
     }
 }
 
@@ -451,7 +451,7 @@ function loadGame() {
                 if (hunger >= 450 || toilet >= 450 || boredom >= 550) {
                     dead = true;
                     currentState = "dead";
-                    alert("熊仔死了");
+                    alert("丸之内が死にました。");
                 }
             }
         }, isSleeping ? 500 : 1000); // Sleep state updates twice per second, otherwise once per second
