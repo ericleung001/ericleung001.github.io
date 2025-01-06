@@ -73,7 +73,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v39</h1>
+    <h1>Pixel Tamagotchi - 熊仔 v40</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -332,8 +332,8 @@
 
         function updateState() {
             const hours = new Date().getHours();
-
-            if(dead = true){
+            dead = false;
+            if(hunger >= 101 || toilet >= 101|| boredom >= 101){
                 currentState = "dead";
             }else if (hours >= 8 || hours < 21) {
                 currentState = "sleeping";
