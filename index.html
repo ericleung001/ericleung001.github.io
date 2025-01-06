@@ -73,7 +73,7 @@
     </style>
 </head>
 <body>
-    <h1>Pixel Tamagotchi - 熊仔 v40</h1>
+    <h1>Pixel Tamagotchi - 熊仔 v41</h1>
     <div id="pixel-pet" class="pixel-container"></div>
     <div>
         <button onclick="feedPet()">餵食</button>
@@ -333,16 +333,16 @@
         function updateState() {
             const hours = new Date().getHours();
             dead = false;
-            if(hunger >= 101 || toilet >= 101|| boredom >= 101){
+            if(hunger >= 450 || toilet >= 450|| boredom >= 550){
                 currentState = "dead";
-            }else if (hours >= 8 || hours < 21) {
+            }else if (hours >= 21 || hours < 8) {
                 currentState = "sleeping";
                 isSleeping = true;
             } else {
                 isSleeping = false;
-                if (hunger >= 80){
+                if (hunger >= 60){
                     currentState = "hungry";
-                } else if (toilet >= 80) {
+                } else if (toilet >= 60) {
                     currentState = "toilet";
                 } else {
                     currentState = "idle";
@@ -436,9 +436,9 @@ function loadGame() {
         setInterval(() => {
             if (!dead) {
                 updateRealTime();
-                let hungerSpeed = isSleeping ? 0.03 : 2; //0.09
-                let toiletSpeed = isSleeping ? 0.03 : 2; //0.09
-                let boredomSpeed = isSleeping ? 0 : 2; //0.07
+                let hungerSpeed = isSleeping ? 0.03 : 0.09; //0.09
+                let toiletSpeed = isSleeping ? 0.03 : 0.09; //0.09
+                let boredomSpeed = isSleeping ? 0 : 0.07; //0.07
 
                 hunger += hungerSpeed;
                 toilet += toiletSpeed;
@@ -448,7 +448,7 @@ function loadGame() {
                 updateAnimation();
                 updateStatusBars();
 
-                if (hunger >= 101 || toilet >= 101 || boredom >= 101) {
+                if (hunger >= 450 || toilet >= 450 || boredom >= 550) {
                     dead = true;
                     currentState = "dead";
                     alert("熊仔死了");
