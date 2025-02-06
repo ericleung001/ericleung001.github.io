@@ -461,6 +461,11 @@
             }
         }, isSleeping ? 500 : 1000); // Sleep state updates twice per second, otherwise once per second
 
+         // 每3秒自動保存一次遊戲進度
+        setInterval(() => {
+            saveGame(); // 每3秒儲存一次遊戲進度
+        }, 3000);
+        
         createPixels();
         updateAnimation();
         updateStatusBars();
@@ -472,7 +477,7 @@
     <h5>注意：</h5>
     <h5>1.iOSのホーム画面にウェブページを追加すると、フルスクリーン表示が可能です。</h5>
     <h5>2.ゲームを保存する際には、文字列をコピーする必要があります。すべての文字が選択されているか確認してください。</h5>
-    <h6>v53、4</h6>
+    <h6>v55</h6>
 </body>
 </html>
 
