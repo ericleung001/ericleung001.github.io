@@ -373,7 +373,7 @@
             }
         }
 
-        function saveGame() {
+         function saveGame() {
             const saveData = {
                 hunger,
                 toilet,
@@ -387,25 +387,24 @@
         }
 
         function loadGame() {
-            try {
-                const saveData = JSON.parse(localStorage.getItem("pixelPetSave")); // 從localStorage讀取存檔
-                const savedDate = new Date(saveData.saveDate); // 儲存時間
-                const now = new Date(); // 當前時間
-                const elapsedMinutes = Math.floor((now - savedDate) / (1000 * 60)); // 計算分鐘差距
+            const savedData = JSON.parse(localStorage.getItem("pixelPetSave"));
+            if (savedData) {
+                const savedTime = new Date(savedData.saveDate);
+                const now = new Date();
+                const elapsedMinutes = Math.floor((now - savedTime) / (1000 * 60)); // 計算時間差距
 
-                hunger = Math.min(450, saveData.hunger + elapsedMinutes * (5 / 10));
-                toilet = Math.min(450, saveData.toilet + elapsedMinutes * (4 / 10));
-                boredom = Math.min(550, saveData.boredom + elapsedMinutes * (6 / 10));
+                hunger = Math.min(450, savedData.hunger + elapsedMinutes * (5 / 10));
+                toilet = Math.min(450, savedData.toilet + elapsedMinutes * (4 / 10));
+                boredom = Math.min(550, savedData.boredom + elapsedMinutes * (6 / 10));
 
-                startDate = new Date(saveData.startDate);
-                isSleeping = saveData.isSleeping;
+                startDate = new Date(savedData.startDate);
+                isSleeping = savedData.isSleeping;
 
                 updateAnimation();
                 updateRealTime();
                 updateStatusBars();
-                alert(`ゲームがロードされました。${elapsedMinutes} 分が経過しました！`);
-            } catch {
-                alert("無効なセーブコードです。");
+            } else {
+                alert("新しいゲームを開始します。");
             }
         }
 
@@ -466,13 +465,14 @@
         updateAnimation();
         updateStatusBars();
         updateRealTime();
+        loadGame(); // 在加載頁面時自動讀取保存進度
     </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4756703747572565"
      crossorigin="anonymous"></script>
     <h5>注意：</h5>
     <h5>1.iOSのホーム画面にウェブページを追加すると、フルスクリーン表示が可能です。</h5>
     <h5>2.ゲームを保存する際には、文字列をコピーする必要があります。すべての文字が選択されているか確認してください。</h5>
-    <h6>v53</h6>
+    <h6>v53、4</h6>
 </body>
 </html>
 
