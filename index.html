@@ -373,42 +373,41 @@
             }
         }
 
-function saveGame() {
-    const saveData = {
-        hunger,
-        toilet,
-        boredom,
-        startDate: startDate.toISOString(), // 起始日期
-        saveDate: new Date().toISOString(), // 當前儲存時間
-        isSleeping
-    };
-    saveInput.value = btoa(JSON.stringify(saveData)); // 將數據編碼為 Base64
-}
+        function saveGame() {
+            const saveData = {
+                hunger,
+                toilet,
+                boredom,
+                startDate: startDate.toISOString(), // 起始日期
+                saveDate: new Date().toISOString(), // 當前儲存時間
+                isSleeping
+            };
+            localStorage.setItem("pixelPetSave", JSON.stringify(saveData)); // 儲存進localStorage
+            saveInput.value = btoa(JSON.stringify(saveData)); // 將數據編碼為 Base64
+        }
 
-function loadGame() {
-    try {
-        const saveData = JSON.parse(atob(saveInput.value)); // 解碼存檔數據
-        const savedDate = new Date(saveData.saveDate); // 儲存時間
-        const now = new Date(); // 當前時間
-        const elapsedMinutes = Math.floor((now - savedDate) / (1000 * 60)); // 計算分鐘差距
+        function loadGame() {
+            try {
+                const saveData = JSON.parse(localStorage.getItem("pixelPetSave")); // 從localStorage讀取存檔
+                const savedDate = new Date(saveData.saveDate); // 儲存時間
+                const now = new Date(); // 當前時間
+                const elapsedMinutes = Math.floor((now - savedDate) / (1000 * 60)); // 計算分鐘差距
 
-        // 更新狀態值，根據時間差距增加數值
-        hunger = Math.min(450, saveData.hunger + elapsedMinutes * (5 / 10)); // 每天增加5，換算到每分鐘增加5/1440
-        toilet = Math.min(450, saveData.toilet + elapsedMinutes * (4 / 10)); // 每天增加4，換算到每分鐘增加4/1440
-        boredom = Math.min(550, saveData.boredom + elapsedMinutes * (6 / 10)); // 每天增加6，換算到每分鐘增加6/1440
+                hunger = Math.min(450, saveData.hunger + elapsedMinutes * (5 / 10));
+                toilet = Math.min(450, saveData.toilet + elapsedMinutes * (4 / 10));
+                boredom = Math.min(550, saveData.boredom + elapsedMinutes * (6 / 10));
 
-        startDate = new Date(saveData.startDate); // 恢復存檔的起始日期
-        isSleeping = saveData.isSleeping; // 恢復睡眠狀態
+                startDate = new Date(saveData.startDate);
+                isSleeping = saveData.isSleeping;
 
-        updateAnimation(); // 更新畫面動畫
-        updateRealTime(); // 更新時間顯示
-        updateStatusBars(); // 更新狀態條
-
-        alert(`ゲームがロードされました。${elapsedMinutes} 分が経過しました！`); // 顯示載入資訊
-    } catch {
-        alert("無効なセーブコードです。");
-    }
-}
+                updateAnimation();
+                updateRealTime();
+                updateStatusBars();
+                alert(`ゲームがロードされました。${elapsedMinutes} 分が経過しました！`);
+            } catch {
+                alert("無効なセーブコードです。");
+            }
+        }
 
 
         function updateStatusBars() {
@@ -473,7 +472,7 @@ function loadGame() {
     <h5>注意：</h5>
     <h5>1.iOSのホーム画面にウェブページを追加すると、フルスクリーン表示が可能です。</h5>
     <h5>2.ゲームを保存する際には、文字列をコピーする必要があります。すべての文字が選択されているか確認してください。</h5>
-    <h6>v52</h6>
+    <h6>v53</h6>
 </body>
 </html>
 
